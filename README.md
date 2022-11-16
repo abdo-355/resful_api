@@ -1,3 +1,3 @@
-# Shop with Node js and TypeScript
+# RESTful api project with Node js and TypeScript
 
-back-end focused shop project to learn and practice node js with typescript
+RESTful back-end server to learn and practice node js with typescript
