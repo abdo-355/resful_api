@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { addAbortSignal } from "stream";
+import { validationResult } from "express-validator";
 
 export const getPosts: RequestHandler = (req, res, next) => {
   res.status(200).json({
@@ -22,7 +22,17 @@ export const createPost: RequestHandler = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
 
-  console.log(title, content);
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({
+        message: "Validation failed, entered data is incorrect",
+        errors: errors.array(),
+      });
+  }
+
   // TODO: Create post in the db
   res.status(201).json({
     message: "Post saved successfully",
