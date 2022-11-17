@@ -2,7 +2,18 @@ import { RequestHandler } from "express";
 
 export const getPosts: RequestHandler = (req, res, next) => {
   res.status(200).json({
-    posts: [{ title: "post title", content: "post content" }],
+    posts: [
+      {
+        _id: "12345qwerty",
+        title: "post title",
+        content: "post content",
+        imageUrl: "images/BMW.jpg",
+        creator: {
+          name: "Abdo",
+        },
+        createdAt: new Date(),
+      },
+    ],
   });
 };
 
