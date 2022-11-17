@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { addAbortSignal } from "stream";
 
 export const getPosts: RequestHandler = (req, res, next) => {
   res.status(200).json({
@@ -25,6 +26,12 @@ export const createPost: RequestHandler = (req, res, next) => {
   // TODO: Create post in the db
   res.status(201).json({
     message: "Post saved successfully",
-    post: { id: new Date().toISOString(), title, content },
+    post: {
+      id: new Date().toISOString(),
+      title,
+      content,
+      creator: { name: "Abdo" },
+      createdAt: new Date(),
+    },
   });
 };
