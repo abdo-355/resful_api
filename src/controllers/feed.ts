@@ -7,21 +7,17 @@ export interface ResponseError extends Error {
   statusCode?: number;
 }
 
-export const getPosts: RequestHandler = (req, res, next) => {
-  res.status(200).json({
-    posts: [
-      {
-        _id: "12345qwerty",
-        title: "post title",
-        content: "post content",
-        imageUrl: "images/BMW.jpg",
-        creator: {
-          name: "Abdo",
-        },
-        createdAt: new Date(),
-      },
-    ],
-  });
+export const getPosts: RequestHandler = async (req, res, next) => {
+  try {
+    const posts = await Post.find();
+
+    res.status(200).json({ message: "fetched posts successfully", posts });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
 export const getPost: RequestHandler = async (req, res, next) => {
@@ -35,7 +31,7 @@ export const getPost: RequestHandler = async (req, res, next) => {
       throw error;
     }
 
-    res.status(200).json({ message: "post fetched", post });
+    res.status(200).json({ message: "post fetched", post: post });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -62,7 +58,7 @@ export const createPost: RequestHandler = async (req, res, next) => {
     const post = new Post({
       title,
       content,
-      imgUrl: "this is an image url",
+      imgUrl: "images/BMW.jpg",
       creator: { name: "Abdo" },
     });
 
