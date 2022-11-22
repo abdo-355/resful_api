@@ -24,6 +24,26 @@ export const getPosts: RequestHandler = (req, res, next) => {
   });
 };
 
+export const getPost: RequestHandler = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      const error: ResponseError = new Error("could not find post");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({ message: "post fetched", post });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 export const createPost: RequestHandler = async (req, res, next) => {
   try {
     const title = req.body.title;
