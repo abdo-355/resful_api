@@ -55,10 +55,20 @@ export const createPost: RequestHandler = async (req, res, next) => {
       throw error;
     }
 
+    if (!req.file) {
+      const error: ResponseError = new Error("No image provided");
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const imgUrl = req.file.path.replace("\\", "/");
+    console.log(req.file.path);
+    console.log(imgUrl);
+
     const post = new Post({
       title,
       content,
-      imgUrl: "images/BMW.jpg",
+      imgUrl,
       creator: { name: "Abdo" },
     });
 
