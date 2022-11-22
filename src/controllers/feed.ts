@@ -3,6 +3,10 @@ import { validationResult } from "express-validator";
 
 import Post from "../models/post";
 
+export interface ResponseError extends Error {
+  statusCode?: number;
+}
+
 export const getPosts: RequestHandler = (req, res, next) => {
   res.status(200).json({
     posts: [
@@ -28,10 +32,11 @@ export const createPost: RequestHandler = async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(422).json({
-        message: "Validation failed, entered data is incorrect",
-        errors: errors.array(),
-      });
+      const error: ResponseError = new Error(
+        "Validation failed, entered data is incorrect"
+      );
+      error.statusCode = 422;
+      throw error;
     }
 
     const post = new Post({
@@ -48,6 +53,9 @@ export const createPost: RequestHandler = async (req, res, next) => {
       post: result,
     });
   } catch (err) {
-    console.log(err);
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
   }
 };
