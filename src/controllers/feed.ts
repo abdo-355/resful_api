@@ -11,9 +11,18 @@ export interface ResponseError extends Error {
 
 export const getPosts: RequestHandler = async (req, res, next) => {
   try {
-    const posts = await Post.find();
+    const currentPage = +req.query.page! || 1;
+    const perPage = 2;
 
-    res.status(200).json({ message: "fetched posts successfully", posts });
+    const totalItems = await Post.find().countDocuments();
+
+    const posts = await Post.find()
+      .skip(perPage * (currentPage - 1))
+      .limit(perPage);
+
+    res
+      .status(200)
+      .json({ message: "fetched posts successfully", posts, totalItems });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
