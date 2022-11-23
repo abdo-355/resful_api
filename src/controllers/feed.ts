@@ -142,6 +142,36 @@ export const updatePost: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const deletePost: RequestHandler = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      const error: ResponseError = new Error("Could not find post");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // TODO: check logged in user
+
+    clearImage(post.imgUrl);
+
+    await Post.findByIdAndRemove(postId);
+
+    res.status(202).json({
+      message: "Post deleted successfully",
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+// to delete image from our local storage
 const clearImage = (filePath: string) => {
   filePath = path.join(__dirname, "..", "..", filePath);
   fs.unlink(filePath, (err) => console.log(err));
