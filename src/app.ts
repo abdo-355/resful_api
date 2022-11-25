@@ -7,6 +7,8 @@ import multer, { FileFilterCallback } from "multer";
 import { v4 as uuidv4 } from "uuid";
 
 import feedRoutes from "./routes/feed";
+import authRoutes from "./routes/auth";
+
 import { ResponseError } from "./controllers/feed";
 
 const app = express();
@@ -52,6 +54,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 
 app.use(
   (
