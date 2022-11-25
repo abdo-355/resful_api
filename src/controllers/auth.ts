@@ -1,9 +1,13 @@
 import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 import User from "../models/user";
 import ResponseError from "../utils/responseError";
+
+dotenv.config();
 
 export const signup: RequestHandler = async (req, res, next) => {
   try {
@@ -51,6 +55,14 @@ export const login: RequestHandler = async (req, res, next) => {
       error.statusCode = 401;
       throw error;
     }
+
+    const token = jwt.sign(
+      { email: user.email, userId: user._id.toString() },
+      process.env.SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ token, userId: user._id.toString() });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
