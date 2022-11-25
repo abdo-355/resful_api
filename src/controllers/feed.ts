@@ -141,6 +141,12 @@ export const updatePost: RequestHandler = async (req, res, next) => {
       throw error;
     }
 
+    if (req.userId !== post.creator.toString()) {
+      const error: ResponseError = new Error("Not authorized");
+      error.statusCode = 403;
+      throw error;
+    }
+
     if (imgUrl !== post.imgUrl) {
       clearImage(post.imgUrl);
     }
@@ -173,7 +179,11 @@ export const deletePost: RequestHandler = async (req, res, next) => {
       throw error;
     }
 
-    // TODO: check logged in user
+    if (req.userId !== post.creator.toString()) {
+      const error: ResponseError = new Error("Not authorized");
+      error.statusCode = 403;
+      throw error;
+    }
 
     clearImage(post.imgUrl);
 
