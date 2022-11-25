@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 
 import Post from "../models/post";
+import User from "../models/user";
 import ResponseError from "../utils/responseError";
 
 export const getPosts: RequestHandler = async (req, res, next) => {
@@ -75,14 +76,26 @@ export const createPost: RequestHandler = async (req, res, next) => {
       title,
       content,
       imgUrl,
-      creator: { name: "Abdo" },
+      creator: req.userId,
     });
 
     const result = await post.save();
 
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      const error: ResponseError = new Error("User doesn't exist");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    user.posts!.push(post._id);
+    await user.save();
+
     res.status(201).json({
-      message: "Post saved successfully",
+      message: "Post created successfully",
       post: result,
+      creator: { _id: user._id, name: user.name },
     });
   } catch (err) {
     if (!err.statusCode) {

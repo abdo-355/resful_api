@@ -1,11 +1,10 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 interface IPost {
   title: string;
   imgUrl: string;
   content: string;
-  // TODO: update that when adding the user model
-  creator: Object;
+  creator: Types.ObjectId;
 }
 
 const postSchema = new Schema<IPost>(
@@ -23,7 +22,8 @@ const postSchema = new Schema<IPost>(
       required: true,
     },
     creator: {
-      type: Object,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
   },
