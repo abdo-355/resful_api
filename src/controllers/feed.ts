@@ -4,10 +4,7 @@ import fs from "fs";
 import path from "path";
 
 import Post from "../models/post";
-
-export interface ResponseError extends Error {
-  statusCode?: number;
-}
+import ResponseError from "../utils/responseError";
 
 export const getPosts: RequestHandler = async (req, res, next) => {
   try {

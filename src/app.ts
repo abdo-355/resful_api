@@ -8,8 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import feedRoutes from "./routes/feed";
 import authRoutes from "./routes/auth";
-
-import { ResponseError } from "./controllers/feed";
+import ResponseError from "./utils/responseError";
 
 const app = express();
 dotenv.config();
@@ -66,7 +65,8 @@ app.use(
     console.log(err);
     const status = err.statusCode || 500;
     const message = err.message;
-    res.status(status).json({ message });
+    const data = err.data;
+    res.status(status).json({ message, data });
   }
 );
 
