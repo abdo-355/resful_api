@@ -31,3 +31,30 @@ export const signup: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const login: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      const error: ResponseError = new Error("No such user exists");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const isEqual = await bcrypt.compare(password, user.password);
+
+    if (!isEqual) {
+      const error: ResponseError = new Error("Wrong password");
+      error.statusCode = 401;
+      throw error;
+    }
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
