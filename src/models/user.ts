@@ -5,14 +5,14 @@ interface IUser {
   email: string;
   password: string;
   status: string;
-  posts: Schema.Types.ObjectId[];
+  posts?: Schema.Types.ObjectId[];
 }
 
 const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  status: { type: String, required: true },
+  status: { type: String, default: "I am new!" },
   posts: [{ type: String, ref: "Post" }],
 });
 
