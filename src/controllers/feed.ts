@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import fs from "fs";
 import path from "path";
+import { ObjectId } from "mongoose";
 
 import Post from "../models/post";
 import User from "../models/user";
@@ -188,6 +189,11 @@ export const deletePost: RequestHandler = async (req, res, next) => {
     clearImage(post.imgUrl);
 
     await Post.findByIdAndRemove(postId);
+
+    await User.findOneAndUpdate(
+      { _id: req.userId },
+      { $pull: { posts: postId } }
+    );
 
     res.status(202).json({
       message: "Post deleted successfully",
