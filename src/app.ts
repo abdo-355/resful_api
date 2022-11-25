@@ -13,6 +13,15 @@ import ResponseError from "./utils/responseError";
 const app = express();
 dotenv.config();
 
+// to save the user Id later
+declare global {
+  namespace Express {
+    interface Request {
+      userId: string;
+    }
+  }
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./images");
