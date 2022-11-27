@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 
 import Post from "../models/post";
-import User from "../models/user";
+import User, { IUser } from "../models/user";
 import ResponseError from "../utils/responseError";
 import { io } from "../app";
 
@@ -16,6 +16,8 @@ export const getPosts: RequestHandler = async (req, res, next) => {
     const totalItems = await Post.find().countDocuments();
 
     const posts = await Post.find()
+      .populate<{ creator: IUser }>("creator")
+      .sort({ createdAt: -1 })
       .skip(perPage * (currentPage - 1))
       .limit(perPage);
 
@@ -139,7 +141,7 @@ export const updatePost: RequestHandler = async (req, res, next) => {
       throw error;
     }
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate("creator");
 
     if (!post) {
       const error: ResponseError = new Error("could not find post");
@@ -147,7 +149,7 @@ export const updatePost: RequestHandler = async (req, res, next) => {
       throw error;
     }
 
-    if (req.userId !== post.creator.toString()) {
+    if (req.userId !== post.creator._id.toString()) {
       const error: ResponseError = new Error("Not authorized");
       error.statusCode = 403;
       throw error;
@@ -161,6 +163,8 @@ export const updatePost: RequestHandler = async (req, res, next) => {
     post.content = content;
     post.imgUrl = imgUrl;
     const result = await post.save();
+
+    io.emit("posts", { action: "update", post: result });
 
     res
       .status(200)
