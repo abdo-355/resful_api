@@ -6,16 +6,21 @@ import dotenv from "dotenv";
 import multer, { FileFilterCallback } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import http from "http";
+import { Server } from "socket.io";
 
 import feedRoutes from "./routes/feed";
 import authRoutes from "./routes/auth";
 import ResponseError from "./utils/responseError";
-import socket from "./utils/socket";
 
 const app = express();
 dotenv.config();
 const server = http.createServer(app);
-const io = socket.init(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 // to save the user Id later
 declare global {
