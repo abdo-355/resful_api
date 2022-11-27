@@ -204,6 +204,8 @@ export const deletePost: RequestHandler = async (req, res, next) => {
       { $pull: { posts: postId } }
     );
 
+    io.emit("posts", { action: "delete", post: postId });
+
     res.status(202).json({
       message: "Post deleted successfully",
     });
