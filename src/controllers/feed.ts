@@ -2,11 +2,11 @@ import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import fs from "fs";
 import path from "path";
-import { ObjectId } from "mongoose";
 
 import Post from "../models/post";
 import User from "../models/user";
 import ResponseError from "../utils/responseError";
+import { io } from "../app";
 
 export const getPosts: RequestHandler = async (req, res, next) => {
   try {
@@ -92,6 +92,11 @@ export const createPost: RequestHandler = async (req, res, next) => {
 
     user.posts!.push(post._id);
     await user.save();
+
+    io.emit("posts", {
+      action: "create",
+      post: { ...post._doc, creator: { _id: req.userId, name: user.name } },
+    });
 
     res.status(201).json({
       message: "Post created successfully",

@@ -1,6 +1,10 @@
 import { Schema, model, Types } from "mongoose";
 
-interface IPost {
+interface DocumentResult<T> {
+  _doc: T;
+}
+
+interface IPost extends DocumentResult<IPost> {
   title: string;
   imgUrl: string;
   content: string;
