@@ -5,8 +5,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import multer, { FileFilterCallback } from "multer";
 import { v4 as uuidv4 } from "uuid";
+import { graphqlHTTP } from "express-graphql";
+import { buildSchema } from "type-graphql";
 
 import ResponseError from "./utils/responseError";
+import { testResolver } from "./graphql/resolvers";
 
 const app = express();
 dotenv.config();
@@ -74,9 +77,25 @@ app.use(
   }
 );
 
-mongoose
-  .connect(process.env.MONGO_URI!)
-  .then((result) => {
+const main = async () => {
+  try {
+    const schema = await buildSchema({
+      resolvers: [testResolver],
+    });
+
+    app.use(
+      "/graphql",
+      graphqlHTTP({
+        schema,
+      })
+    );
+
+    await mongoose.connect(process.env.MONGO_URI!);
+
     app.listen(8080);
-  })
-  .catch((err) => console.log(err));
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+main();
