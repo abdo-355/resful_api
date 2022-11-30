@@ -89,6 +89,19 @@ const main = async () => {
       graphqlHTTP({
         schema,
         graphiql: true,
+        customFormatErrorFn(err) {
+          if (!err.originalError) {
+            return err;
+          }
+
+          const error = err.originalError as ResponseError;
+
+          const data = error.data;
+          const message = err.message;
+          const code = error.statusCode;
+
+          return { message, status: code, data };
+        },
       })
     );
 
