@@ -5,22 +5,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import multer, { FileFilterCallback } from "multer";
 import { v4 as uuidv4 } from "uuid";
-import http from "http";
-import { Server } from "socket.io";
 
-import feedRoutes from "./routes/feed";
-import authRoutes from "./routes/auth";
 import ResponseError from "./utils/responseError";
 
 const app = express();
 dotenv.config();
-const server = http.createServer(app);
-export const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
 
 // to save the user Id later
 declare global {
@@ -70,9 +59,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/feed", feedRoutes);
-app.use("/auth", authRoutes);
-
 app.use(
   (
     err: ResponseError,
@@ -88,13 +74,9 @@ app.use(
   }
 );
 
-io.on("connection", (socket) => {
-  console.log("socket connected");
-});
-
 mongoose
   .connect(process.env.MONGO_URI!)
   .then((result) => {
-    server.listen(8080);
+    app.listen(8080);
   })
   .catch((err) => console.log(err));
