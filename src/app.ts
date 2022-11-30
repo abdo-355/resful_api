@@ -9,7 +9,8 @@ import { graphqlHTTP } from "express-graphql";
 import { buildSchema } from "type-graphql";
 
 import ResponseError from "./utils/responseError";
-import { testResolver } from "./graphql/resolvers";
+import testResolver from "./graphql/resolvers/testResolver";
+import userResolver from "./graphql/resolvers/userResolver";
 
 const app = express();
 dotenv.config();
@@ -80,13 +81,14 @@ app.use(
 const main = async () => {
   try {
     const schema = await buildSchema({
-      resolvers: [testResolver],
+      resolvers: [testResolver, userResolver],
     });
 
     app.use(
       "/graphql",
       graphqlHTTP({
         schema,
+        graphiql: true,
       })
     );
 
