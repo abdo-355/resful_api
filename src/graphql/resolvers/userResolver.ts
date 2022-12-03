@@ -2,11 +2,16 @@ import { Resolver, Mutation, Arg } from "type-graphql";
 import "reflect-metadata";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 import { userInput } from "../schemas/userInput";
 import userSchema from "../schemas/user";
 import User from "../../models/user";
 import ResponseError from "../../utils/responseError";
+import { authData } from "../schemas/auth";
+
+dotenv.config();
 
 @Resolver()
 class userResolver {
@@ -48,6 +53,32 @@ class userResolver {
     const createdUser = await user.save();
 
     return { ...createdUser._doc, _id: createdUser._id.toString() };
+  }
+
+  @Mutation(() => authData)
+  async login(@Arg("email") email: string, @Arg("password") password: string) {
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error: ResponseError = new Error("User not found");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const isEqual = await bcrypt.compare(password, user.password);
+
+    if (!isEqual) {
+      const error: ResponseError = new Error("Incorrect password");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const token = jwt.sign(
+      { email: user.email, userId: user._id.toString() },
+      process.env.SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    return { token, userId: user._id.toString() };
   }
 }
 
