@@ -9,6 +9,8 @@ interface IPost extends DocumentResult<IPost> {
   imgUrl: string;
   content: string;
   creator: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const postSchema = new Schema<IPost>(

@@ -11,18 +11,11 @@ import { buildSchema } from "type-graphql";
 import ResponseError from "./utils/responseError";
 import testResolver from "./graphql/resolvers/testResolver";
 import userResolver from "./graphql/resolvers/userResolver";
+import postResolver from "./graphql/resolvers/postResolver";
+import auth from "./middleware/auth";
 
 const app = express();
 dotenv.config();
-
-// to save the user Id later
-declare global {
-  namespace Express {
-    interface Request {
-      userId: string;
-    }
-  }
-}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -66,6 +59,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(auth);
+
 app.use(
   (
     err: ResponseError,
@@ -84,7 +79,7 @@ app.use(
 const main = async () => {
   try {
     const schema = await buildSchema({
-      resolvers: [testResolver, userResolver],
+      resolvers: [testResolver, userResolver, postResolver],
     });
 
     app.use(

@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { Resolver, Query } from "type-graphql";
 import "reflect-metadata";
 
 @Resolver()
