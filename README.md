@@ -1,3 +1,3 @@
-# RESTful api project with Node js and TypeScript
+#  api server with Node js and TypeScript
 
-RESTful back-end server to learn and practice node js with typescript
+RESTful and GraphQl back-end server to learn and practice node js with typescript
