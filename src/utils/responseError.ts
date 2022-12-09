@@ -2,7 +2,7 @@ import { ValidationError } from "express-validator";
 
 interface ResponseError extends Error {
   statusCode?: number;
-  data?: ValidationError[] | { message: string }[];
+  data?: ValidationError[];
 }
 
 export default ResponseError;

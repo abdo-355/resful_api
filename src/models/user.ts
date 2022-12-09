@@ -1,10 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 
-interface IUserDocument<T> {
-  _doc: T;
-}
-
-export interface IUser extends IUserDocument<IUser> {
+export interface IUser {
   name: string;
   email: string;
   password: string;

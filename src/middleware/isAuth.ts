@@ -6,17 +6,18 @@ import ResponseError from "../utils/responseError";
 
 config();
 
-interface IToken {
+interface tokenInterface {
   email: string;
   userId: string;
 }
 
-const auth: RequestHandler = (req, res, next) => {
+const isAuth: RequestHandler = (req, res, next) => {
   const token = req.get("Authorization");
 
   if (!token) {
-    req.isAuth = false;
-    return next();
+    const error: ResponseError = new Error("Not authenticated");
+    error.statusCode = 401;
+    throw error;
   }
 
   let decodedToken;
@@ -24,18 +25,18 @@ const auth: RequestHandler = (req, res, next) => {
   try {
     decodedToken = jwt.verify(token, process.env.SECRET!);
   } catch (err) {
-    req.isAuth = false;
-    return next();
+    err.statusCode = 500;
+    throw err;
   }
 
   if (!decodedToken) {
-    req.isAuth = false;
-    return next();
+    const error: ResponseError = new Error("Not authenticated");
+    error.statusCode = 401;
+    throw error;
   }
 
-  req.userId = (decodedToken as IToken).userId;
-  req.isAuth = true;
+  req.userId = (decodedToken as tokenInterface).userId;
   next();
 };
 
-export default auth;
+export default isAuth;

@@ -5,17 +5,31 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import multer, { FileFilterCallback } from "multer";
 import { v4 as uuidv4 } from "uuid";
-import { graphqlHTTP } from "express-graphql";
-import { buildSchema } from "type-graphql";
+import http from "http";
+import { Server } from "socket.io";
 
+import feedRoutes from "./routes/feed";
+import authRoutes from "./routes/auth";
 import ResponseError from "./utils/responseError";
-import testResolver from "./graphql/resolvers/testResolver";
-import userResolver from "./graphql/resolvers/userResolver";
-import postResolver from "./graphql/resolvers/postResolver";
-import auth from "./middleware/auth";
 
 const app = express();
 dotenv.config();
+const server = http.createServer(app);
+export const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+// to save the user Id later
+declare global {
+  namespace Express {
+    interface Request {
+      userId: string;
+    }
+  }
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -53,13 +67,11 @@ app.use((req, res, next) => {
     "GET, POST, PUT, PATCH, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
   next();
 });
 
-app.use(auth);
+app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 
 app.use(
   (
@@ -76,39 +88,13 @@ app.use(
   }
 );
 
-const main = async () => {
-  try {
-    const schema = await buildSchema({
-      resolvers: [testResolver, userResolver, postResolver],
-    });
+io.on("connection", (socket) => {
+  console.log("socket connected");
+});
 
-    app.use(
-      "/graphql",
-      graphqlHTTP({
-        schema,
-        graphiql: true,
-        customFormatErrorFn(err) {
-          if (!err.originalError) {
-            return err;
-          }
-
-          const error = err.originalError as ResponseError;
-
-          const data = error.data;
-          const message = err.message;
-          const code = error.statusCode;
-
-          return { message, status: code, data };
-        },
-      })
-    );
-
-    await mongoose.connect(process.env.MONGO_URI!);
-
-    app.listen(8080);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-main();
+mongoose
+  .connect(process.env.MONGO_URI!)
+  .then((result) => {
+    server.listen(8080);
+  })
+  .catch((err) => console.log(err));
