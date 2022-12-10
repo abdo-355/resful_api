@@ -6,7 +6,7 @@ import isAuth from "../middleware/isAuth";
 
 const router = express.Router();
 
-router.get("/posts", isAuth, feedController.getPosts);
+router.get("/posts", feedController.getPosts);
 
 router.post(
   "/post",
