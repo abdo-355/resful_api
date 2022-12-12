@@ -22,15 +22,6 @@ export const io = new Server(server, {
   },
 });
 
-// to save the user Id later
-declare global {
-  namespace Express {
-    interface Request {
-      userId: string;
-    }
-  }
-}
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./images");

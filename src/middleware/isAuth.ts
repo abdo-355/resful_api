@@ -11,6 +11,15 @@ interface tokenInterface {
   userId: string;
 }
 
+// to save the user Id later
+declare global {
+  namespace Express {
+    interface Request {
+      userId: string;
+    }
+  }
+}
+
 const isAuth: RequestHandler = (req, res, next) => {
   const token = req.get("Authorization");
 
