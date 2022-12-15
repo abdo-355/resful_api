@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register 'src/tests/*.spec.ts'",
+    "test": "mocha -r ts-node/register 'src/tests/*.spec.ts' --timeout 4000",
     "start": "ts-node-dev --respawn src/app.ts"
   },
   "author": "",
